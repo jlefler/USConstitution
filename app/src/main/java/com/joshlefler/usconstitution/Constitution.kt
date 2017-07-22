@@ -7,6 +7,7 @@ import org.xmlpull.v1.XmlPullParserFactory
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.io.Serializable
 
 class Constitution {
     fun parseConstitution(context : Context): ArrayList<Node> {
@@ -23,6 +24,7 @@ class Constitution {
         var currentArticle : Node? = null
         var currentSection : Node?
         var currentParent : Node? = null
+        var currentAmendment : Node? = null
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
             when (eventType) {
@@ -35,6 +37,11 @@ class Constitution {
                     } "article" -> {
                         currentArticle = Node(parser.getAttributeValue(null, "description"), parser.getAttributeValue(null, "id"), parser.getAttributeValue(null, "type"), parser.getAttributeValue(null, "name"))
                         currentPart!!.articles.add(currentArticle)
+                        currentParent = currentArticle
+                    } "amendment" -> {
+                        currentAmendment = Node(parser.getAttributeValue(null, "description"), parser.getAttributeValue(null, "id"), parser.getAttributeValue(null, "type"), parser.getAttributeValue(null, "name"))
+                        currentPart!!.amendments.add(currentAmendment)
+                        currentParent = currentAmendment
                     }  "section" -> {
                         currentSection = Node(parser.getAttributeValue(null, "description"), parser.getAttributeValue(null, "id"), parser.getAttributeValue(null, "type"), parser.getAttributeValue(null, "name"))
                         currentArticle!!.sections.add(currentSection)
@@ -61,12 +68,13 @@ class Constitution {
 
 }
 
-data class Node(val description : String, val id: String, val type: String, val name : String = "") {
+data class Node(val description : String, val id: String, val type: String, val name : String = "") : Serializable {
     val paragraphs = ArrayList<Paragraph>()
     val articles = ArrayList<Node>()
     val sections = ArrayList<Node>()
+    val amendments = ArrayList<Node>()
 
-    //override fun toString() : String = description
+    override fun toString() : String = (name + " " + description).trim() //Kind of hacky, but let's us use standard ArrayAdapter for list views.
 
 }
 

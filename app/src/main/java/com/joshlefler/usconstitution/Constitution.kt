@@ -78,6 +78,6 @@ data class Node(val description : String, val id: String, val type: String, val 
 
 }
 
-data class Paragraph(val description : String, val id : String, val name : String, val type : String) {
+data class Paragraph(val description : String, val id : String, val name : String, val type : String) : Serializable {
     var content = ""
 }
